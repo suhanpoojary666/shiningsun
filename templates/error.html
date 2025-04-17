@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invalid Location</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4ECDC4;
+            --secondary: #45B7AF;
+            --text-dark: #2c3e50;
+            --gradient-bg: linear-gradient(160deg, #a1c4fd 0%, #c2e9fb 100%);
+            --card-bg: rgba(255, 255, 255, 0.98);
+        }
+
+        body {
+            background: linear-gradient(120deg, #a1c4fd, #c2e9fb, #4ecdc4, #45b7af);
+            background-size: 300% 300%;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            margin: 0;
+            animation: gradientFlow 12s ease infinite;
+            display: flex;
+            flex-direction: column; /* Stack logo and error container vertically */
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin: 20px 0; /* Add spacing around the logo */
+        }
+
+        .logo {
+            max-width: 300px; /* Increase the width of the logo */
+            height: auto; /* Maintain aspect ratio */
+            transition: transform 0.3s ease; /* Add a hover effect */
+        }
+
+        .logo:hover {
+            transform: scale(1.1); /* Slight zoom effect on hover */
+        }
+
+        .error-container {
+            text-align: center;
+            padding: 40px; /* Reduce padding for a smaller container */
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            max-width: 500px; /* Reduce the maximum width */
+            width: 90%;
+        }
+
+        .error-icon {
+            font-size: 80px; /* Keep the size of the icon */
+            color: var(--primary);
+            margin-bottom: 20px; /* Adjust spacing below the icon */
+        }
+
+        .error-message {
+            font-size: 28px; /* Slightly reduce the font size of the error message */
+            font-weight: 800; /* Keep the text bold */
+            color: var(--text-dark);
+            margin-bottom: 20px; /* Adjust spacing below the message */
+        }
+
+        .error-details {
+            font-size: 16px; /* Slightly reduce the font size of the details */
+            color: var(--text-dark);
+            margin-bottom: 20px; /* Adjust spacing below the details */
+            line-height: 1.6; /* Adjust line height for readability */
+        }
+
+        .home-link {
+            display: inline-block;
+            margin-top: 20px; /* Adjust spacing above the button */
+            padding: 14px 28px; /* Slightly reduce padding for the button */
+            color: white;
+            background-color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px; /* Slightly reduce font size of the button text */
+            font-weight: 700; /* Keep the button text bold */
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-link:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Section -->
+    <div class="logo-container">
+        <img src="static/logo.png" alt="Logo" class="logo" width="408" height="194">
+    </div>
+
+    <!-- Error Container -->
+    <div class="error-container">
+        <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
+        <div class="error-message">INVALID LOCATION</div>
+        <div class="error-details">
+            {{location}} is invalid!!!
+           <br> Please enter a valid location and try again</br></div>
+        <a href="/" class="home-link">Go Back</a>
+    </div>
+</body>
+</html>

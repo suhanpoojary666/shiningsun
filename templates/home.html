@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shiningsun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4ECDC4;
+            --secondary: #45B7AF;
+            --text-dark: #2c3e50;
+            --gradient-bg: linear-gradient(160deg, #a1c4fd 0%, #c2e9fb 100%);
+            --card-bg: rgba(255, 255, 255, 0.98);
+        }
+
+        /* Updated background animation */
+        body {
+            background: linear-gradient(120deg, #a1c4fd, #c2e9fb, #4ecdc4, #45b7af);
+            background-size: 300% 300%;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            margin: 0;
+            animation: gradientFlow 12s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+            padding: 0; /* Remove padding from the body */
+        }
+
+        /* Keyframes for smooth gradient flow */
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .cloud {
+            position: absolute;
+            opacity: 0.5; /* Increased visibility */
+            animation: float 25s linear infinite, pulse 4s ease-in-out infinite;
+            z-index: 0;
+            filter: blur(1px); /* Reduced blur for better visibility */
+        }
+
+        .cloud-1 { top: 15%; left: -200px; width: 150px; animation-delay: 0s; }
+        .cloud-2 { top: 30%; right: -250px; width: 200px; animation-delay: 5s; }
+        .cloud-3 { top: 50%; left: -300px; width: 180px; animation-delay: 10s; }
+        .cloud-4 { top: 70%; right: -200px; width: 140px; animation-delay: 15s; }
+        .cloud-5 { top: 85%; left: -250px; width: 160px; animation-delay: 20s; }
+        .cloud-6 { top: 10%; right: -300px; width: 120px; animation-delay: 25s; }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-100%) translateY(0); }
+            100% { transform: translateX(150vw) translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.2; }
+        }
+
+        /* General container styling */
+        .container {
+            max-width: 1200px;
+
+            margin: 10px auto; /* Reduce vertical spacing between containers */
+            padding: 1rem 0; /* Reduce padding inside the container */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Weather card styling */
+        .weather-card {
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            padding: 2rem; /* Adjust padding inside the weather card */
+            margin: 10px auto; /* Reduce vertical spacing around the weather card */
+            max-width: 800px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .weather-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Weather card header */
+        .weather-card-header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(78, 205, 196, 0.1);
+            padding-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .location-title {
+            font-size: 1rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Location display */
+        .location-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .location-input {
+            display: none; /* Initially hidden */
+            font-size: 1.2rem;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            background: rgba(255, 255, 255, 0.9); /* Light background for contrast */
+            border: 2px solid var(--primary); /* Add a border matching the theme */
+            border-radius: 1rem; /* Rounded corners */
+            padding: 0.5rem 1rem;
+            width: 100%; /* Full width for better usability */
+            max-width: 300px; /* Limit the width */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            outline: none; /* Remove default outline */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth focus effect */
+        }
+
+        .location-input:focus {
+            border-color: #45b7af; /* Change border color on focus */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow on focus */
+        }
+
+        .area-name {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-right: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .country-name {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 500;
+            align-self: flex-end;
+            margin-bottom: 0.15rem;
+        }
+
+        .edit-pen {
+            width: 24px;
+            height: 24px;
+            margin-left: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            color: var(--primary); /* Inherits from CSS variable */
+        }
+
+        .edit-pen:hover {
+            transform: scale(1.1); /* Hover effect */
+        }
+
+        .temp-section {
+            text-align: center; /* Align text to the center */
+            flex: 1; /* Allow equal spacing */
+            margin: 0; /* Remove unnecessary margins */
+        }
+
+        .temperature {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .aqi-badge {
+            font-size: 1.2rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            margin-top: 1rem;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .weather-content {
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            align-items: center; /* Center items vertically */
+            gap: 2rem; /* Maintain spacing between sections */
+            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+            width: 100%; /* Ensure it spans the full width of the card */
+        }
+
+        .condition-container {
+            display: flex;
+            flex-direction: column; /* Stack the icon and condition vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center items vertically */
+            text-align: center; /* Ensure text is centered */
+            flex: 1; /* Allow equal spacing */
+            margin: 0; /* Remove unnecessary margins */
+        }
+
+        .icon-container {
+            width: 100px; /* Adjust size of the circular container */
+            height: 100px;
+            background: rgba(255, 255, 255, 0.9); /* Light background for contrast */
+            border-radius: 50%; /* Make it circular */
+            display: flex;
+            align-items: center; /* Center the icon vertically */
+            justify-content: center; /* Center the icon horizontally */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+        }
+
+        .icon-container:hover {
+            transform: translateY(-5px); /* Slight lift on hover */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+        }
+
+        .weather-icon {
+            width: 80px; /* Adjust size for better fit */
+            height: 80px;
+            transition: transform 0.3s ease;
+        }
+
+        .weather-icon:hover {
+            transform: scale(1.1); /* Slight zoom effect on hover */
+        }
+
+        .condition {
+            font-size: 1.5rem; /* Adjust font size */
+            font-weight: 700; /* Keep bold font for emphasis */
+            font-family: 'Montserrat', sans-serif; /* Modern and clean font */
+            color: var(--primary); /* Use the primary theme color */
+            text-transform: capitalize; /* Capitalize the first letter */
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            margin-top: 1rem; /* Add spacing between the icon and condition text */
+            transition: transform 0.3s ease, color 0.3s ease; /* Smooth hover effect */
+        }
+
+        .condition:hover {
+            transform: scale(1.1); /* Slight zoom effect on hover */
+            color: #45b7af; /* Change color on hover */
+        }
+
+        /* Weather stats */
+        .weather-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 1rem;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.3rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 2rem 0 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* History grid */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0; /* Adjust padding inside the history grid */
+            justify-content: center;
+            margin: 10px 0; /* Reduce vertical spacing around the history grid */
+        }
+
+        .history-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .history-date {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .history-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0.5rem 0;
+        }
+
+        .history-temp {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0.2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .location-editor {
+                padding: 0.8rem 1.5rem;
+            }
+
+            .area-name {
+                font-size: 1.6rem;
+            }
+            
+            .country-name {
+                font-size: 1rem;
+            }
+            
+            .temperature {
+                font-size: 3rem;
+            }
+            
+            .condition {
+                font-size: 1.3rem;
+            }
+            
+            .weather-content {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .weather-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .cloud {
+                display: none;
+            }
+        }
+
+        /* Small stat containers */
+        .stat-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+        .stat-box {
+            flex: 1 1 calc(25% - 1rem); /* Responsive: 4 boxes per row */
+            max-width: 200px;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Colors for different stats */
+        .stat-box.temp {
+            background: linear-gradient(160deg, #ff9a9e 0%, #fecfef 100%);
+            color: #fff;
+        }
+
+        .stat-box.wind {
+            background: linear-gradient(160deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #fff;
+        }
+
+        .stat-box.uv {
+            background: linear-gradient(160deg, #fbc2eb 0%, #a6c1ee 100%);
+            color: #fff;
+        }
+
+        .stat-box.humidity {
+            background: linear-gradient(160deg, #d4fc79 0%, #96e6a1 100%);
+            color: #fff;
+        }
+
+        /* Stat value and label */
+        .stat-box .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-box .stat-label {
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .alert-container {
+            background: #ffe6e6; /* Light red background for alerts */
+            border-left: 5px solid #ff4d4d; /* Red border for emphasis */
+            padding: 1rem; /* Adjust padding inside the alert container */
+            margin: 10px 0; /* Reduce vertical spacing around the alert container */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-headline {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d32f2f; /* Dark red for headline */
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center; /* Align icon and text vertically */
+            gap: 0.5rem; /* Add spacing between icon and text */
+        }
+
+        .alert-icon {
+            font-size: 48px; /* Adjust size */
+            color: red; /* Adjust color */
+            margin-right: 0.5rem; /* Add spacing between icon and text */
+            vertical-align: middle; /* Align icon with text */
+        }
+
+        .logo-container {
+            text-align: center;
+            margin: 10px 0; /* Reduce spacing around the logo */
+            padding: 0; /* Remove padding around the logo */
+        }
+
+        .logo {
+            max-width: 408px; /* Set the width */
+            height: auto; /* Maintain aspect ratio */
+            transition: transform 0.3s ease; /* Add a hover effect */
+        }
+
+        .logo:hover {
+            transform: scale(1.1); /* Slight zoom effect on hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Section -->
+    <div class="logo-container">
+        <img src="static/logo.png" alt="Logo" class="logo" width="408" height="194">
+    </div>
+
+    <!-- Updated cloud images -->
+    <img src="https://cdn-icons-png.flaticon.com/512/414/414927.png" class="cloud cloud-1" alt="cloud">
+    <img src="https://cdn-icons-png.flaticon.com/512/414/414927.png" class="cloud cloud-2" alt="cloud">
+    <img src="https://cdn-icons-png.flaticon.com/512/414/414927.png" class="cloud cloud-3" alt="cloud">
+    <img src="https://cdn-icons-png.flaticon.com/512/414/414927.png" class="cloud cloud-4" alt="cloud">
+    <img src="https://cdn-icons-png.flaticon.com/512/414/414927.png" class="cloud cloud-5" alt="cloud">
+    <img src="https://cdn-icons-png.flaticon.com/512/414/414927.png" class="cloud cloud-6" alt="cloud">
+
+    <div class="container">
+        <div class="weather-card">
+            <div class="weather-card-header">
+                <div class="location-title">Current Location</div>
+                <form method="post" class="location-editor" id="locationForm">
+                    {% csrf_token %}
+                    <div class="location-display">
+                        <span class="area-name">{{current.area}}</span>
+                        <span class="country-name">{{current.country}}</span>
+                        <svg class="edit-pen" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
+                            <path d="M13.5 7.5L16.5 10.5M4 20H8L18 10L14 6L4 16V20Z" 
+                                  stroke-linecap="round" 
+                                  stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        class="location-input" 
+                        name="location"
+                        value="{{current.area}}"
+                        placeholder="Enter location..."
+                        onkeypress="return handleLocationEdit(event)"
+                    >
+                </form>
+            </div>
+            <div class="weather-content">
+                <div class="temp-section">
+                    <div class="temperature">{{current.temperature}}°</div>
+                    <div class="aqi-badge">AQI {{current.aqi}}</div>
+                </div>
+                <div class="condition-container">
+                    <div class="icon-container">
+                        <img src="{{current.icon}}" class="weather-icon" alt="Weather Icon">
+                    </div>
+                    <div class="condition">{{current.condition}}</div>
+                </div>
+            </div>
+            <div class="weather-stats">
+                <div class="stat-item">
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                        <path d="M12 2v20M12 2l4 4M12 2L8 6M12 22l4-4M12 22l-4-4"/>
+                    </svg>
+                    <div>
+                        <div class="stat-value">{{current.wind}} km/h</div>
+                        <div class="stat-label">Wind Speed</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                        <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                    </svg>
+                    <div class="stat-value">{{current.uv}}</div>
+                    <div class="stat-label">UV Index</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Separate Alert Container -->
+    <div class="container">
+        {% if alert %}
+        <div class="alert-container">
+            <h2 class="alert-headline">
+                <span class="alert-icon"><i class="fas fa-exclamation-triangle" style="font-size:48px;color:red"></i></span>{{alert.headline}}
+            </h2>
+            {%if alert.event%}
+            <p><strong>Event:</strong>  {{ alert.event }}</p>
+            {% endif %}
+            {%if alert.area%}
+            <p><strong>Area:</strong> {{ alert.area }}</p>
+            {% endif %}
+            {%if alert.desc%}
+            <p><strong>Description:</strong> <br>{{ alert.desc }}</br></p>
+            {% endif %}
+            {%if alert.certainty%}
+            <p><strong>Certainty:</strong>  {{ alert.certainty }}</p>
+            {% endif %}
+            {%if alert.effective%}
+            <p><strong>Effective From:</strong>  {{ alert.effective }}</p>
+            {% endif %}
+            {%if alert.expires%}
+            <p><strong>Expires At:</strong>  {{ alert.expires }}</p>
+            {% endif %}
+            {% if alert.instruction %}
+            <p><strong>Instructions:</strong> <br>{{ alert.instruction }}</br></p>
+            {% endif %}
+            {%if alert.urgency%}
+            <p><strong>Urgency:</strong>  {{ alert.urgency }}</p>
+            {% endif %}
+            {%if alert.severity%}
+            <p><strong>Severity:</strong>  {{ alert.severity }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+
+    <h2 class="history-title">7-Day Forecast</h2>
+    <div class="history-grid">
+        {% for history in history.values %}
+        <div class="history-card">
+            <div class="history-date">{{history.date}}</div>
+            <img src="{{history.icon}}" class="history-icon" alt="History Weather">
+            <div class="history-temp">{{history.av_temp}}°C</div>
+            <div class="stat-label">{{history.weather}}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        // Toggle between display and input modes for location editing
+        document.querySelector('.edit-pen').addEventListener('click', function (e) {
+            e.stopPropagation();
+            const display = document.querySelector('.location-display');
+            const input = document.querySelector('.location-input');
+            const pen = this;
+
+            if (input.style.display === 'none' || !input.style.display) {
+                // Switch to input mode
+                display.style.display = 'none';
+                input.style.display = 'block';
+                input.focus();
+                pen.innerHTML = '<path d="M2 12h20" /><path d="M12 2v14" /><path d="M12 2l7 7-7 7-7-7 7-7z" />';
+            } else {
+                // Switch back to display mode
+                display.style.display = 'flex';
+                input.style.display = 'none';
+                pen.innerHTML = '<path d="M12 2l7 7-7 7-7-7 7-7z" /><path d="M12 2v14" /><path d="M2 12h20" />';
+            }
+        });
+
+        // Handle form submission on pressing Enter
+        function handleLocationEdit(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('locationForm').submit();
+            }
+        }
+
+        // Randomize cloud animations
+        document.querySelectorAll('.cloud').forEach(cloud => {
+            cloud.style.animationDuration = `${Math.random() * 15 + 20}s`;
+            cloud.style.animationDelay = `${Math.random() * 10}s`;
+        });
+    </script>
+</body>
+</html>
