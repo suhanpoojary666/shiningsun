@@ -30,7 +30,7 @@ def index(request):
     BASE_URL = 'http://api.weatherapi.com/v1/current.json'
 
     params = {  
-        'key': '4c3eb9c9a70241409a3100318251004',
+        'key': 'API KEY',
         'q': location,  
         'aqi': 'yes'        
     }
@@ -105,7 +105,7 @@ def index(request):
             HIS_URL = 'http://api.weatherapi.com/v1/history.json'
 
             params1 = {  
-            'key': '4c3eb9c9a70241409a3100318251004',
+            'key': 'API KEY',
             'q': location, 
             'dt': f"{y}-{m}-{d}", 
             'aqi': 'yes'      
@@ -127,7 +127,7 @@ def index(request):
         ALR_URL = 'http://api.weatherapi.com/v1/forecast.json'
 
         params2={
-            'key': '4c3eb9c9a70241409a3100318251004',
+            'key': 'API KEY',
             'q': location, 
             'days': 3,
             'alerts': 'yes'        
