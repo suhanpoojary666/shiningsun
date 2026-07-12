@@ -1,5 +1,6 @@
 from django.shortcuts import render
 import requests
+import os
 
 def calculate_aqi(pm25):
 
@@ -30,7 +31,7 @@ def index(request):
     BASE_URL = 'http://api.weatherapi.com/v1/current.json'
 
     params = {  
-        'key': 'API KEY',
+        'key': os.environ.get("WEATHER_API_KEY"),
         'q': location,  
         'aqi': 'yes'        
     }
@@ -105,7 +106,7 @@ def index(request):
             HIS_URL = 'http://api.weatherapi.com/v1/history.json'
 
             params1 = {  
-            'key': 'API KEY',
+            'key': os.environ.get("WEATHER_API_KEY"),
             'q': location, 
             'dt': f"{y}-{m}-{d}", 
             'aqi': 'yes'      
@@ -127,7 +128,7 @@ def index(request):
         ALR_URL = 'http://api.weatherapi.com/v1/forecast.json'
 
         params2={
-            'key': 'API KEY',
+            'key': os.environ.get("WEATHER_API_KEY"),
             'q': location, 
             'days': 3,
             'alerts': 'yes'        
