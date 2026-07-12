@@ -28,7 +28,7 @@ def index(request):
     location='Bengaluru' #default location is set to Bengaluru
     location=request.POST.get('location','Bengaluru')
 
-    BASE_URL = 'http://api.weatherapi.com/v1/current.json'
+    BASE_URL = 'https://api.weatherapi.com/v1/current.json'
 
     params = {  
         'key': os.environ.get("WEATHER_API_KEY"),
@@ -103,7 +103,7 @@ def index(request):
             if len(m)==1:
                 m='0'+m
 
-            HIS_URL = 'http://api.weatherapi.com/v1/history.json'
+            HIS_URL = 'https://api.weatherapi.com/v1/history.json'
 
             params1 = {  
             'key': os.environ.get("WEATHER_API_KEY"),
@@ -125,7 +125,7 @@ def index(request):
 
         #data about current weather
 
-        ALR_URL = 'http://api.weatherapi.com/v1/forecast.json'
+        ALR_URL = 'https://api.weatherapi.com/v1/forecast.json'
 
         params2={
             'key': os.environ.get("WEATHER_API_KEY"),
