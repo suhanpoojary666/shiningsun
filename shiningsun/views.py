@@ -1,6 +1,8 @@
 from django.shortcuts import render
 import requests
+import json
 import os
+from .redis_client import redis_client #imported the redis client variable
 
 def calculate_aqi(pm25):
 
@@ -23,106 +25,137 @@ def calculate_aqi(pm25):
 
     return None
 
-
 def index(request):
+
+    all_data={} #this dict. will store all the data dict. and will be sent with render request
+    currents={} #this dict. will store all the current weather data
+    history={}  #this dict. will store all the weather history data(past 7 days)
+    alerts={}   #this will store the weather alerts if any 
+
+
     location='Bengaluru' #default location is set to Bengaluru
     location=request.POST.get('location','Bengaluru')
 
-    BASE_URL = 'https://api.weatherapi.com/v1/current.json'
+    key1=f"current:{location.lower()}" #defined the general key syntax for redis storage
+    cache_data1=redis_client.get(key1)
 
-    params = {  
+
+    key3=f"alert:{location.lower()}" #defined the general key syntax for redis storage
+    cache_data3=redis_client.get(key3)
+
+    if cache_data1==None:
+        BASE_URL = 'https://api.weatherapi.com/v1/current.json'
+
+        params = {  
         'key': os.environ.get("WEATHER_API_KEY"),
         'q': location,  
         'aqi': 'yes'        
-    }
-    response = requests.get(BASE_URL, params=params)
+        }
+        
+        response = requests.get(BASE_URL, params=params)
 
-    if response.status_code ==200:
+        if response.status_code ==200:
+            redis_client.setex(
+                key1,
+                600,
+                response.text
+            )
+            current = response.json()
 
-        all_data={} #this dict. will store all the data dict. and will be sent with render request
-        currents={} #this dict. will store all the current weather data
-        history={}  #this dict. will store all the weather history data(past 7 days)
-        alerts={}   #this will store the weather alerts if any    
-
-        current = response.json()  
-
-        currents['area']=current['location']['name']
-        currents['country']=current['location']['country']
-        currents['temperature']=current['current']['temp_c']
-        currents['condition']=current['current']['condition']['text']
-        currents['aqi']=calculate_aqi(current['current']['air_quality']['pm2_5'])
-        currents['icon']=current['current']['condition']['icon']
-        currents['humidity']=current['current']['humidity']
-        currents['wind']=current['current']['wind_kph']
-        currents['uv']=current['current']['uv']
+        else:
+            return render(request,'error.html',{'location':location})
+        
+    else:
+        current=json.loads(cache_data1)
 
 
-        #slicing the string with present date for weather history of past 7 days
+       #slicing the string with present date for weather history of past 7 days
 
-        time=current['current']['last_updated'] #time in 'yyyy-mm-dd hh:mm:ss' format
-        year=time[0:4]
-        month=time[5:7]    #slicing it to 'yyyy','mm' and 'dd' format for fetching the history data 
-        day=time[8:10]
-        d=int(day)
-        m=int(month)
-        y=int(year)
+    time=current['current']['last_updated'] #time in 'yyyy-mm-dd hh:mm:ss' format
+    year=time[0:4]
+    month=time[5:7]    #slicing it to 'yyyy','mm' and 'dd' format for fetching the history data 
+    day=time[8:10]
+    d=int(day)
+    m=int(month)
+    y=int(year)
 
 
-        for i in range(8):
+    for i in range(8):
 
-            d=int(d)
-            m=int(m)    #converting it to 'int' type for arithmatic operation
-            y=int(y)   
+        d=int(d)
+        m=int(m)    #converting it to 'int' type for arithmatic operation
+        y=int(y)   
             
-            # calculates 7 past dates without any conflicts like leap years previous month etc
+        # calculates 7 past dates without any conflicts like leap years previous month etc
 
-            if m==1 or m==5 or m==7 or m==9 or m==11:
-                x=30
-            elif m==2 or m==4 or m==6 or m==8 or m==10 or m==12 :
-                x=31
+        if m==1 or m==5 or m==7 or m==9 or m==11:
+            x=30
+        elif m==2 or m==4 or m==6 or m==8 or m==10 or m==12 :
+            x=31
+        else:
+            if y%400==0:
+                x=29
             else:
-                if y%400==0:
-                    x=29
-                else:
-                    x=28
+                x=28
 
-            d=d-1
-            if d==0:
-                d=x
-                m=m-1
-                if m==0:
-                    m=12
-                    y=y-1
+        d=d-1
+        if d==0:
+            d=x
+            m=m-1
+            if m==0:
+                m=12
+                y=y-1
 
-            d=str(d)
-            m=str(m)    
-            y=str(y)
+        d=str(d)
+        m=str(m)    
+        y=str(y)
 
-            if len(d)==1:   #if day or month is single digit converting it to '0X' format to satisfy the dd-mm format
-                d='0'+d
-            if len(m)==1:
-                m='0'+m
+        if len(d)==1:   #if day or month is single digit converting it to '0X' format to satisfy the dd-mm format
+            d='0'+d
+        if len(m)==1:
+            m='0'+m
 
+        key2=f"history:{location.lower()}-{y}-{m}-{d}" #defined the general key syntax for redis storage
+        cache_data2=redis_client.get(key2)
+        
+        if cache_data2==None:
             HIS_URL = 'https://api.weatherapi.com/v1/history.json'
 
             params1 = {  
-            'key': os.environ.get("WEATHER_API_KEY"),
-            'q': location, 
-            'dt': f"{y}-{m}-{d}", 
-            'aqi': 'yes'      
+                'key': os.environ.get("WEATHER_API_KEY"),
+                'q': location, 
+                'dt': f"{y}-{m}-{d}", 
+                'aqi': 'yes'      
             }
 
             response1 = requests.get(HIS_URL, params=params1)
-            history_data = response1.json()
+
+            if response1.status_code==200:
+
+                redis_client.setex(
+                    key2,
+                    600,
+                    response1.text
+                )
+
+                history_data=response1.json()
+
+            else:
+                return render(request,'error.html',{'location':location})
             
-            history[i]={}   #stores the av_temp and weather for past 7 days each in a nested dictionary
 
-            history[i]["av_temp"] = history_data['forecast']['forecastday'][0]['day']['avgtemp_c']
-            history[i]["weather"] = history_data['forecast']['forecastday'][0]['day']['condition']['text'] 
-            history[i]["icon"] = history_data['forecast']['forecastday'][0]['day']['condition']['icon']
-            history[i]["date"]=f"{d}-{m}-{y}"
+        else:
+            history_data=json.loads(cache_data2)
+
+        history[i]={}   #stores the av_temp and weather for past 7 days each in a nested dictionary
+
+        history[i]["av_temp"] = history_data['forecast']['forecastday'][0]['day']['avgtemp_c']
+        history[i]["weather"] = history_data['forecast']['forecastday'][0]['day']['condition']['text'] 
+        history[i]["icon"] = history_data['forecast']['forecastday'][0]['day']['condition']['icon']
+        history[i]["date"]=f"{d}-{m}-{y}"
 
 
+    if cache_data3==None:
         #data about current weather
 
         ALR_URL = 'https://api.weatherapi.com/v1/forecast.json'
@@ -135,29 +168,48 @@ def index(request):
         }
 
         response2=requests.get(ALR_URL,params=params2)
+        redis_client.setex(
+                key3,
+                600,
+                response2.text
+            )
         alert_data=response2.json()
         
-        if alert_data['alerts']['alert']:
-                alert=alert_data['alerts']['alert'][0]
-                alerts['headline']=alert['headline']
-                alerts['severity']=alert['severity']
-                alerts['areas']=alert['areas']
-                alerts['effective']=alert['effective'][:10]
-                alerts['expires']=alert['expires'][:10] #slicing the time to 'yyyy-mm-dd' format
-                alerts['instruction']=alert['instruction']
-                alerts['certainty']=alert['certainty']
-                alerts['urgency']=alert['urgency']
-                alerts['desc']=alert['desc']
-                alerts['event']=alert['event']
+    else:
+        alert_data=json.loads(cache_data3)
+
+
+    currents['area']=current['location']['name']
+    currents['country']=current['location']['country']
+    currents['temperature']=current['current']['temp_c']
+    currents['condition']=current['current']['condition']['text']
+    currents['aqi']=calculate_aqi(current['current']['air_quality']['pm2_5'])
+    currents['icon']=current['current']['condition']['icon']
+    currents['humidity']=current['current']['humidity']
+    currents['wind']=current['current']['wind_kph']
+    currents['uv']=current['current']['uv']
+    
+
+ 
+
+    if alert_data['alerts']['alert']:
+        alert=alert_data['alerts']['alert'][0]
+        alerts['headline']=alert['headline']
+        alerts['severity']=alert['severity']
+        alerts['areas']=alert['areas']
+        alerts['effective']=alert['effective'][:10]
+        alerts['expires']=alert['expires'][:10] #slicing the time to 'yyyy-mm-dd' format
+        alerts['instruction']=alert['instruction']
+        alerts['certainty']=alert['certainty']
+        alerts['urgency']=alert['urgency']
+        alerts['desc']=alert['desc']
+        alerts['event']=alert['event']
                 
 
-        all_data={
+    all_data={
             'current':currents,
             'history':history,
             'alert':alerts
         } 
-        print(alert_data['alerts']['alert'])
-        return render(request,'home.html',all_data)
         
-    else:
-        return render(request,'error.html',{'location':location})
+    return render(request,'home.html',all_data)
